@@ -1,11 +1,13 @@
 import pymongo
 from functools import wraps
-from config import mongo_username,mongo_password
+from config import mongo_username,mongo_password,mongo_url
+
+
 def mongo(f):
     @wraps(f)
     def wrap(*args,**kwargs):
-        with pymongo.MongoClient(f"mongodb+srv://{mongo_username}:{mongo_password}@trackr.qaowl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority") as database:
-            return f(database['trackr'],*args,**kwargs)
+        with pymongo.MongoClient(f"mongodb+srv://{mongo_username}:{mongo_password}@{mongo_url}") as database:
+            return f(database['jaq'],*args,**kwargs)
     return wrap
 
 def token_required(f):

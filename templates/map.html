@@ -1,0 +1,22 @@
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js"></script>
+    <script>
+      mapboxgl.accessToken = "pk.eyJ1IjoiamFxcSIsImEiOiJja3dwbG04ZzYwMWF3Mm9vMnp6OW11YXVyIn0.4V2TDCPDk6H7Pc65EmkIYQ";
+    </script>
+    <script src="/static/mapkick.js"></script>
+
+
+</head>
+<div id="map" style="height: calc(100% - 100px);"></div>
+
+<script>
+    $.getJSON('/data/traffic.json', function(data){
+      try {
+    new Mapkick.Map("map", data);}
+    catch {
+      alert("No Data Yet")
+    }
+    })
+</script>
