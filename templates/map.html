@@ -1,22 +1,121 @@
 <head>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <!--Mapkick/Mapbox-->
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.js"></script>
-    <script>
+   <script>
       mapboxgl.accessToken = "pk.eyJ1IjoiamFxcSIsImEiOiJja3dwbG04ZzYwMWF3Mm9vMnp6OW11YXVyIn0.4V2TDCPDk6H7Pc65EmkIYQ";
     </script>
     <script src="/static/mapkick.js"></script>
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/draggable/1.0.0-beta.12/draggable.min.js"></script>
+    <!--CDNs for datetime picker-->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-timepicker-addon.css') }}">  
+    <script src="{{ url_for('static', filename='datetime/jquery-ui.js') }}"></script>    
+    <script type="text/javascript" src="{{ url_for('static', filename='datetime/jquery-ui-timepicker-addon.js') }}"></script>  
+    <script type="text/javascript" src="{{ url_for('static', filename='datetime/jquery-ui-timepicker-addon-i18n.min.js') }}"></script>  
+    <script type="text/javascript" src="{{ url_for('static', filename='datetime/jquery-ui-sliderAccess.js') }}"></script>
+    <style>
+      .ui-datepicker { 
+      position: fixed;
+      top:auto;
+      bottom:30px;
+      right:auto;
+      left:0 !important
+      }
+    </style>
+    <!--CDNs for datetime picker-->
 </head>
-<div id="map" style="height: calc(100% - 100px);"></div>
+<body id="height:100vh">
+
+  <div id="map" style="height: calc(100% - 100px);">
+  </div>
+
+  <div id="controls" style="border: 1px solid brown; height:100px; cursor: move;">
+    <div style="border:2px solid red; display:table; border-radius: 10px;width:100%;height:90%;margin-top:7px;">
+        <span style="margin: auto;">
+          <input type="search" placeholder="From" class = "new-view-by-btn" id="from" autocomplete="off">
+        </span>
+        <span>
+          <input type="search" placeholder="To"  class = "new-view-by-btn" id="to" autocomplete="off">
+        </span>
+        <br>
+        <span>
+          <label for="location">Location:</label>
+          <select name="location" id="location">
+            <option value="US" selected>USA</option>
+            <option value="all">All</option>
+          </select>
+          <select name="state" id="state">
+            <option value="" selected>All</option>
+            <option value="NV" >NV</option>
+          </select>      
+        </span>
+        <span>
+            <button style="background-color: red;float:right;border-radius: 10px;color:white;" onclick=update_map()>Update
+            </button>
+        </span>
+    </div>
+  </div>
+
+  <div id="data_table" style="border: 1px solid rgb(0, 0, 0);height: calc(100% - 100px)">
+    
+  </div>
+
+</body>
+<script>
+  let now = Date.now()
+  console.log(now)
+  $.getJSON(`/data/traffic.json/0/${now}/US/`, function(data){
+    try {
+        console.log(data)
+        new Mapkick.Map("map", data)
+      }
+    catch {
+        alert("No Data")
+      }
+  })
+</script>
 
 <script>
-    $.getJSON('/data/traffic.json', function(data){
-      try {
-    new Mapkick.Map("map", data);}
-    catch {
-      alert("No Data Yet")
+  $(document).ready(function(){
+   // jQuery methods go here...
+	
+    $('#from').datetimepicker({
+    beforeShow: function (input, inst) {
+        var rect = input.getBoundingClientRect();
+        setTimeout(function () {
+	        inst.dpDiv.css({ bottom: "0", left:"0","top":"auto","z-index":"2000"});
+        }, 0);
     }
-    })
+	});
+	$('#to').datetimepicker({
+		hour:23,minute:59,
+    beforeShow: function (input, inst) {
+        var rect = input.getBoundingClientRect();
+        setTimeout(function () {
+	        inst.dpDiv.css({ bottom: "0", left:"0","top":"auto","z-index":"2000"});
+        }, 0);
+    }
+	});
+  })
+</script>
+
+<script>
+  const update_map = () =>{
+    const location = $("#location").val()
+    const state = $("#state").val()
+    const from = new Date($("#from").val()).getTime()
+    const to = new Date($("#to").val()).getTime()
+
+    $.getJSON(`/data/traffic.json/${from}/${to}/${location}/${state}`, function(data){
+    try {
+        console.log(data)
+        new Mapkick.Map("map", data)
+      }
+    catch {
+        alert("No Data")
+      }
+  })
+  }
 </script>
